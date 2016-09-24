@@ -29,7 +29,10 @@ class Client:
 
 	def _pull(self):
 		self._services = []
-		raw = self._client.read(self._root, recursive = True, sorted=True)
+		try:
+			raw = self._client.read(self._root, recursive = True, sorted=True)
+		except etcd.EtcdKeyNotFound:
+			return
 		rawServices = [x for x in raw.get_subtree() if not x.key == self._root ]
 		for service in rawServices:
 			data = json.loads(service.value)
