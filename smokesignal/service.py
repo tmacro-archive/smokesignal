@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import hashlib
 
 class Backend:
 	def __init__(self, host = None, port = None, **kwargs):
@@ -8,6 +9,7 @@ class Backend:
 
 		self.host = host
 		self.port = port
+		self.uuid = hashlib.md5((self.host + str(self.port)).encode('utf-8')).hexdigest()
 
 	def __eq__(self, other):
 		if self.host == getattr(other, 'host', None) and self.port == getattr(other, 'port', None):
@@ -18,6 +20,7 @@ class Backend:
 		payload = dict(
 				host = self.host,
 				port = self.port,
+				id = self.uuid,
 				)
 
 		return payload
@@ -41,6 +44,7 @@ class Service:
 			self.service_port = None
 
 		self._backends = []
+		self._numBackends = 0
 
 		if kwargs.get('backends', False):
 			for b in kwargs['backends']:
@@ -51,6 +55,8 @@ class Service:
 			if mode == 'tcp':
 				self.subdomain = kwargs['route']
 
+		self.uuid = hashlib.md5(self.name.encode('utf-8')).hexdigest()
+
 	def addBackend(self, backend = None, host = None, port = None, **kwargs):
 		if backend:
 			self._backends.append(backend)
@@ -58,6 +64,7 @@ class Service:
 			self._backends.append(Backend(host, port))
 		else:
 			return False
+		self._numBackends = self._numBackends + 1
 		return True
 
 	def __eq__(self, other):
@@ -85,9 +92,12 @@ class Service:
 		payload = dict(
 			route = self.name,
 			mode = self.mode,
+			id = self.uuid,
 		)
 		if self.subdomain:
 			payload['route'] = self.subdomain
 		if self.service_port:
 			payload['service_port'] = self.service_port
+		backends = [x.dump() for x in self._backends]
+		payload['backends'] = backends
 		return payload

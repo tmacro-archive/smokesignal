@@ -24,9 +24,7 @@ class Client:
 	def _push(self):
 		for service in self._services:
 			path = '/'.join([self._root, self._hash(service.name)])
-			backends = [x.dump() for x in service.backends]
 			data = service.dump()
-			data['backends'] = backends
 			self._client.write(path, json.dumps(data), ttl = self._ttl)
 
 	def _pull(self):
