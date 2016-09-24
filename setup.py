@@ -16,7 +16,7 @@ with open('requirements_dev.txt') as test_req_file:
 	test_requirements = [x for x in test_req_file.read().split('\n')]
 
 setup(
-    name='smokesignal',
+    name='smokesignal-etcd',
     version='0.1.1',
     description="Simple library to publish and read service descriptions using etcd",
     long_description=readme + '\n\n' + history,
