@@ -9,17 +9,15 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = [
-    # TODO: put package requirements here
-]
+with open('requirements.txt') as req_file:
+	requirements = [x for x in req_file.read().split('\n')]
 
-test_requirements = [
-    # TODO: put package test requirements here
-]
+with open('requirements_dev.txt') as test_req_file:
+	test_requirements = [x for x in test_req_file.read().split('\n')]
 
 setup(
     name='smokesignal',
-    version='0.0.0',
+    version='0.1.0',
     description="Simple library to publish and read service descriptions using etcd",
     long_description=readme + '\n\n' + history,
     author="Taylor McKinnon",
@@ -28,8 +26,6 @@ setup(
     packages=[
         'smokesignal',
     ],
-    package_dir={'smokesignal':
-                 'smokesignal'},
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
@@ -41,11 +37,8 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
     test_suite='tests',
