@@ -17,7 +17,7 @@ with open('requirements_dev.txt') as test_req_file:
 
 setup(
     name='smokesignal-etcd',
-    version='0.1.1',
+    version='0.2.0',
     description="Simple library to publish and read service descriptions using etcd",
     long_description=readme + '\n\n' + history,
     author="Taylor McKinnon",
