@@ -2,7 +2,7 @@
 
 __author__ = 'Taylor McKinnon'
 __email__ = 'taylor@uncannypacket.com'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 from smokesignal.service import Service, Backend
 from smokesignal.client import Client
