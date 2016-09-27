@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import hashlib
-
+from smokesignal.errors import BackendCreationError, ServiceCreationError
+from collections import OrderedDict
 class Backend:
 	def __init__(self, host = None, port = None, **kwargs):
 
 		if not host or not port:
-			raise Exception('You must provide a host and port!')
+			raise BackendCreationError('No host or port provided!')
 
 		self.host = host
 		self.port = port
@@ -29,19 +30,17 @@ class Backend:
 		return '<Backend host:"%s" port:"%s">'%(self.host, self.port)
 
 class Service:
-	def __init__(self, name = None, mode = 'http', subdomain = None, service_port = None, **kwargs):
-		if not name and not kwargs.get('route', False):
-			raise Exception('You must provide a name!')
+	def __init__(self, name = None, mode = 'http', subdomain = None, uri = None, service_port = None, **kwargs):
+		if not name:
+			raise ServiceCreationError('You must provide a name')
 		self.name = name
 		self.mode = mode
-		if mode == 'tcp':
-			if not service_port:
-				raise Exception('You must provide a service_port')
-			self.subdomain = subdomain
-			self.service_port = service_port
-		else:
-			self.subdomain = None
-			self.service_port = None
+		self.uri = uri
+		self.subdomain = subdomain
+		self.service_port = service_port
+
+		if mode == 'tcp' and not service_port:
+			raise ServiceCreationError('You must provide a service_port')
 
 		self._backends = []
 		self._numBackends = 0
@@ -49,11 +48,6 @@ class Service:
 		if kwargs.get('backends', False):
 			for b in kwargs['backends']:
 				self.addBackend(**b)
-
-		if kwargs.get('route', False):
-			self.name = kwargs['route']
-			if mode == 'tcp':
-				self.subdomain = kwargs['route']
 
 		self.uuid = hashlib.md5(self.name.encode('utf-8')).hexdigest()
 
@@ -73,15 +67,14 @@ class Service:
 		return False
 
 	def __repr__(self):
-		begin = '<Service name:"%s" mode:"%s" '%(self.name, self.mode)
-		if self.mode == 'http':
-			mid = ''
-		elif self.mode == 'tcp':
-			mid = 'service_port:"%s" '%self.service_port
-			if self.subdomain:
-				mid = mid + 'subdomain:"%s" '%self.subdomain
-
-		return begin + mid + 'backends:[%s]>'%', '.join([str(x) for x in self._backends])
+		rep = '<Service name:"%s" mode:"%s" '%(self.name, self.mode)
+		if self.uri:
+			rep = rep + 'uri: %s'%self.uri
+		if self.mode == 'tcp':
+			rep = rep + 'service_port:"%s" '%self.service_port
+		if self.subdomain:
+			rep = rep + 'subdomain:"%s" '%self.subdomain
+		return rep+ 'backends:[%s]>'%', '.join([str(x) for x in self._backends])
 
 	@property
 	def backends(self):
@@ -89,14 +82,16 @@ class Service:
 			yield backend
 
 	def dump(self):
-		payload = dict(
-			route = self.name,
+		payload = OrderedDict(
+			name = self.name,
 			mode = self.mode,
 			id = self.uuid,
 		)
 		if self.subdomain:
-			payload['route'] = self.subdomain
-		if self.service_port:
+			payload['subdomain'] = self.subdomain
+		if slf.uri:
+			payload['uri'] = self.uri
+		if self.mode == 'tcp' and self.service_port:
 			payload['service_port'] = self.service_port
 		backends = [x.dump() for x in self._backends]
 		payload['backends'] = backends
