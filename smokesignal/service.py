@@ -37,10 +37,14 @@ class Service:
 		self.mode = mode
 		self.uri = uri
 		self.subdomain = subdomain
-		self.service_port = service_port
 
-		if mode == 'tcp' and not service_port:
-			raise ServiceCreationError('You must provide a service_port')
+		if mode == 'tcp':
+			if not service_port:
+				raise ServiceCreationError('You must provide a service_port')
+			else:
+				self.service_port = service_port
+		else:
+			self.service_port = None
 
 		self._backends = []
 		self._numBackends = 0

@@ -40,7 +40,6 @@ class TestService:
 		s = Service(name = 'test', mode = 'http', subdomain = 'test', service_port=345)
 		assert s.name == 'test'
 		assert s.mode == 'http'
-		assert s.subdomain == None
 		assert s.service_port == None
 
 	def test_creation_tcp(self):
