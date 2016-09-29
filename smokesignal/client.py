@@ -29,7 +29,6 @@ class Client:
 			self._client.write(path, json.dumps(data), ttl = self._ttl)
 
 	def _pull(self):
-		services = list(self._services)
 		try:
 			raw = self._client.read(self._root, recursive = True, sorted=True)
 		except etcd.EtcdKeyNotFound:
@@ -37,12 +36,16 @@ class Client:
 		rawServices = [x for x in raw.get_subtree() if not x.key == self._root ]
 		for service in rawServices:
 			data = json.loads(service.value)
-			services.append(Service(**data))
+			self._addService(Service(**data))
+
+	def _addService(self, service):
+		services = list(self._services)
+		services.append(service)
 		self._services = set(services)
 
 	def register(self, service = None, name = None, **kwargs):
 		if isinstance(service, Service):
-			self._services.append(service)
+			self._addService(service)
 			return True
 		else:
 			for service in self._services:
@@ -50,8 +53,8 @@ class Client:
 					service.addBackend(**kwargs)
 					return True
 		srvc = Service(name, **kwargs)
-		self._services.append(srvc)
 		srvc.addBackend(**kwargs)
+		self._addService(srvc)
 		return True
 
 	@property
