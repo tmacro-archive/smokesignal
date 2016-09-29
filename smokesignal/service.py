@@ -70,6 +70,9 @@ class Service:
 			return True
 		return False
 
+	def __hash__(self):
+		return hash(self.name)
+
 	def __repr__(self):
 		rep = '<Service name:"%s" mode:"%s" '%(self.name, self.mode)
 		if self.uri:
