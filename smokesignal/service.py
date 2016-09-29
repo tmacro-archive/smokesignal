@@ -96,7 +96,7 @@ class Service:
 		)
 		if self.subdomain:
 			payload['subdomain'] = self.subdomain
-		if slf.uri:
+		if self.uri:
 			payload['uri'] = self.uri
 		if self.mode == 'tcp' and self.service_port:
 			payload['service_port'] = self.service_port
