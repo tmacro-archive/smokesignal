@@ -7,7 +7,7 @@ import hashlib
 import json
 import logging
 
-moduleLogger = logger.getLogger(__name__)
+moduleLogger = logging.getLogger(__name__)
 class Client:
 	def __init__(self, host = None, port = 2379, dns = None, root = '/services', ttl = None):
 		if host:
