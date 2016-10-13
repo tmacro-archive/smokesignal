@@ -5,7 +5,9 @@ from smokesignal.service import Service, Backend
 import etcd
 import hashlib
 import json
+import logging
 
+moduleLogger = logger.getLogger(__name__)
 class Client:
 	def __init__(self, host = None, port = 2379, dns = None, root = '/services', ttl = None):
 		if host:
@@ -30,12 +32,17 @@ class Client:
 
 	def _pull(self):
 		try:
+			moduleLogger.debug('pulling services')
 			raw = self._client.read(self._root, recursive = True, sorted=True)
 		except etcd.EtcdKeyNotFound:
+			moduleLogger.error('etcd key not found!')
 			return
 		rawServices = [x for x in raw.get_subtree() if not x.key == self._root ]
+		if rawServices:
+			self._services = set()
 		for service in rawServices:
 			data = json.loads(service.value)
+			moduleLogger.debug('adding service %s'%data)
 			self._addService(Service(**data))
 
 	def _addService(self, service):
