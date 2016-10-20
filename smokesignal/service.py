@@ -48,7 +48,8 @@ class Service:
 
 		self._backends = []
 		self._numBackends = 0
-
+		self._extra = kwargs.get('extra', {}
+		)
 		if kwargs.get('backends', False):
 			for b in kwargs['backends']:
 				self.addBackend(**b)
@@ -88,11 +89,16 @@ class Service:
 		for backend in self._backends:
 			yield backend
 
+	@property
+	def extra(self):
+		return self._extra
+		
 	def dump(self):
 		payload = OrderedDict(
 			name = self.name,
 			mode = self.mode,
 			id = self.uuid,
+			extra = self._extra,
 		)
 		if self.subdomain:
 			payload['subdomain'] = self.subdomain
